@@ -29,8 +29,8 @@ statement = Statement <$> takeWhile1P (Just "statement") statementCharacter
     where statementCharacter c = not $ elem c ['-', ' ', '\t', '\n', '\r', '(', ')']
 
 field :: Parser String
-field = takeWhile1P (Just "range") fieldChar <* symbol ":"
-    where fieldChar c = elem c ['a'..'z']
+field = takeWhile1P (Just "field") fieldChar <* symbol ":"
+    where fieldChar c = elem c $ ['a'..'z'] ++ ['.']
 
 fieldRange :: Parser Query
 fieldRange = FieldRange <$> field <*> range
