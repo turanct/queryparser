@@ -8,7 +8,6 @@ module Parser
     ) where
 
 import Query
-import Data.Char
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -25,13 +24,57 @@ symbol s = consumeSpaces (string s)
 betweenParens :: Parser a -> Parser a
 betweenParens = between (symbol "(") (symbol ")")
 
-statementCharacter :: Char -> Bool
-statementCharacter c = not $ elem c ['-', ' ', '\t', '\n', '\r', '(', ')']
+statement :: Parser Query
+statement = Statement <$> takeWhile1P (Just "statement") statementCharacter
+    where statementCharacter c = not $ elem c ['-', ' ', '\t', '\n', '\r', '(', ')']
+
+field :: Parser String
+field = takeWhile1P (Just "range") fieldChar <* symbol ":"
+    where fieldChar c = elem c ['a'..'z']
+
+fieldRange :: Parser Query
+fieldRange = FieldRange <$> field <*> range
+    where
+          range :: Parser Range
+          range = do
+              symbol "["
+              r <- choice [try between, try greaterThan, try lessThan]
+              symbol "]"
+              return r
+
+          between :: Parser Range
+          between = do
+              a <- number
+              symbol "TO "
+              b <- number
+              return $ Between a b
+
+          greaterThan :: Parser Range
+          greaterThan = do
+              a <- number
+              symbol "TO *"
+              return $ GreaterThan a
+
+          lessThan :: Parser Range
+          lessThan = do
+              symbol "* TO "
+              a <- number
+              return $ LessThan a
+
+          number :: Parser Int
+          number = fmap read $ some digitChar
+
+fieldValue :: Parser Query
+fieldValue = FieldValue <$> field <*> value
+    where value = takeWhile1P (Just "value") valueChar
+          valueChar c = not $ elem c ['-', ' ', '\t', '\n', '\r', '(', ')']
 
 term :: Parser Query
 term = consumeSpaces (
-           choice [ betweenParens expr
-                  , Statement <$> takeWhile1P (Just "statement") statementCharacter
+           choice [ try (betweenParens expr)
+                  , try fieldRange
+                  , try fieldValue
+                  , statement
                   ] <?> "term"
       )
 
