@@ -64,10 +64,17 @@ fieldRange = FieldRange <$> field <*> range
           number :: Parser Int
           number = fmap read $ some digitChar
 
-fieldValue :: Parser Query
-fieldValue = FieldValue <$> field <*> value
-    where value = takeWhile1P (Just "value") valueChar
-          valueChar c = not $ elem c ['-', ' ', '\t', '\n', '\r', '(', ')']
+fieldValue = FieldValue <$> field <*> (choice [try quotedValue, value])
+    where
+        quotedValue :: Parser String
+        quotedValue = between (symbol "\"") (symbol "\"") (takeWhileP (Just "quotedValue") quotedChar)
+
+        quotedChar c = not $ elem c ['"']
+
+        value :: Parser String
+        value = takeWhile1P (Just "value") valueChar
+
+        valueChar c = not $ elem c ['-', ' ', '\t', '\n', '\r', '(', ')']
 
 term :: Parser Query
 term = consumeSpaces (
