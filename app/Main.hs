@@ -8,7 +8,7 @@ main :: IO ()
 main = interact f
   where
     f :: String -> String
-    f s = fromRight "error" $ fmap pretty $ parseExpression $ unLine s
+    f s = fromRight "error" $ fmap (prettyIndent 0) $ parseExpression $ unLine s
 
     unLine :: String -> String
     unLine = unwords . lines
