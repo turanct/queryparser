@@ -85,10 +85,13 @@ term = consumeSpaces (
                   ] <?> "term"
       )
 
+implicitAnd :: Parser String
+implicitAnd = string " " <* notFollowedBy (space *> string ")")
+
 table = [ [ Prefix (Not <$ try (symbol "-"  )) ]
         , [ InfixL (And <$ try (symbol "AND")) ]
         , [ InfixL (Or  <$ try (symbol "OR" )) ]
-        , [ InfixL (And <$ try (       " "  )) ]
+        , [ InfixL (And <$ try (implicitAnd )) ]
         ]
 
 expr = consumeSpaces (makeExprParser term table) <?> "expression"
