@@ -6,7 +6,7 @@ pretty :: Query -> String
 pretty (And a b) = "(" ++ pretty a ++ " AND " ++ pretty b ++ ")"
 pretty (Or a b) = "(" ++ pretty a ++ " OR " ++ pretty b ++ ")"
 pretty (Not a) = "-" ++ pretty a
-pretty (FieldValue field value) = field ++ ":" ++ value
+pretty (FieldValue field value) = field ++ ":\"" ++ value ++ "\""
 pretty (FieldRange field range) = field ++ ":" ++ prettyRange range
 pretty (Statement a) = a
 
