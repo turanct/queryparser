@@ -28,6 +28,7 @@ library
       Parser
       PrettyPrint
       Query
+      Transform
   other-modules:
       Paths_queryparser
   hs-source-dirs:
