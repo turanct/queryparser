@@ -4,12 +4,22 @@ import Parser
 import Transform
 import PrettyPrint
 import Data.Either
+import System.Environment
 
 main :: IO ()
-main = interact f
-  where
-    f :: String -> String
-    f s = fromRight "error" $ fmap (prettyIndent 0) $ fmap orOutside $ parseExpression $ unLine s
+main = do
+    args <- getArgs
 
-    unLine :: String -> String
-    unLine = unwords . lines
+    userInput <- getContents
+
+    let show' = case (elem "--pretty" args) of
+            True -> (prettyIndent 0)
+            False -> pretty
+
+    let normalize = case (elem "--dnf" args) of
+            True -> orOutside
+            False -> id
+
+    let output = fromRight "error" $ fmap show' $ fmap normalize $ parseExpression userInput
+
+    putStrLn output

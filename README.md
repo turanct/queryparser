@@ -12,6 +12,20 @@ $ stack build
 
 ## Running
 
+Just parsing and outputting the tree:
+
 ```sh
-$ pbpaste | stack exec queryparser-exe
+$ pbpaste | stack exec -- queryparser-exe
+```
+
+Pretty printing:
+
+```sh
+$ pbpaste | stack exec -- queryparser-exe --pretty
+```
+
+Outputting Disjunct Normal Form:
+
+```sh
+$ pbpaste | stack exec -- queryparser-exe --dnf
 ```

@@ -96,4 +96,9 @@ table = [ [ Prefix (Not <$ try (symbol "-"  )) ]
 
 expr = consumeSpaces (makeExprParser term table) <?> "expression"
 
-parseExpression = runParser (expr) ""
+parseExpression = parseOneLine . unLine
+    where
+        parseOneLine = runParser (expr) ""
+
+        unLine :: String -> String
+        unLine = unwords . lines
