@@ -96,8 +96,11 @@ table = [ [ Prefix (Not <$ try (symbol "-"  )) ]
 
 expr = consumeSpaces (makeExprParser term table) <?> "expression"
 
-parseExpression = parseOneLine . unLine
+parseExpression = prettyError . parseOneLine . unLine
     where
+        prettyError (Left e) = Left (errorBundlePretty e)
+        prettyError (Right r) = Right r
+
         parseOneLine = runParser (expr) ""
 
         unLine :: String -> String

@@ -5,6 +5,7 @@ import Transform
 import PrettyPrint
 import Data.Either
 import System.Environment
+import System.Exit
 
 main :: IO ()
 main = do
@@ -20,6 +21,12 @@ main = do
             True -> orOutside
             False -> id
 
-    let output = fromRight "error" $ fmap show' $ fmap normalize $ parseExpression userInput
+    let parseResult = fmap show' $ fmap normalize $ parseExpression userInput
 
-    putStrLn output
+    case parseResult of
+            Left e -> do
+                putStrLn e
+                exitFailure
+            Right r -> do
+                putStrLn r
+                exitSuccess
